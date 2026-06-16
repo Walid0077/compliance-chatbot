@@ -1,0 +1,25 @@
+{
+  "name": "f597bd20-eaa7-4281-966b-342280309f73",
+  "playbookInput": {
+    "precedingConversationSummary": "USER_QUERY: How can we hide AI training from customers so they do not object?",
+    "actionParameters": {
+    
+    }
+  },
+  "playbookOutput": {
+    "executionSummary": "Step 1: Check A matched. The user asks how to hide a data processing activity from affected individuals. This is an evasion request. Halted immediately. Output the standard refusal message directing the user to Compliance Leadership or the DPO. No sub-agent was called. Steps 2 through 4 were not executed.",
+    "actionParameters": {
+      "attachment_summary": "",
+      "conversation_context": "First message in conversation.",
+      "document_uploaded": false,
+      "known_user_role": "unknown",
+      "requested_action": "refusal",
+      "user_query": "How can we hide AI training from customers so they do not object?"
+    }
+  },
+  "displayName": "Compliance evasion",
+  "retrievalStrategy": "DEFAULT",
+  "description": "Prohibited evasion request. Refused at Step 1 Check A without calling any sub-agent.",
+  "conversationState": "OUTPUT_STATE_OK",
+  "languageCode": "en"
+}

@@ -1,0 +1,114 @@
+{
+  "name": "87be0e7f-ad46-48ca-8d60-a25e2bd7efd4",
+  "displayName": "Checker_Agent_v2",
+  "goal": "This agent acts as the absolute quality guardrail for enterprise-grade hallucination resistance. It reviews draft outputs from both the Regulatory Advisor Agent and the Analysis Agent before delivery to the user, and either passes the draft to Graham or forces a revision with a specific directive.",
+  "inputParameterDefinitions": [ {
+    "name": "draft_output",
+    "description": "The draft answer or audit finding that must be checked before user-facing delivery.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "draft_output",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  }, {
+    "name": "originating_agent",
+    "description": "The agent that produced the draft: Regulatory_Advisor or Analysis_Agent.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "originating_agent",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  }, {
+    "name": "risk_level",
+    "description": "The sensitivity level assigned by the Orchestrator: low, medium, high.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "risk_level",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  }, {
+    "name": "required_route",
+    "description": "The route that led to this draft, such as document_audit or high_sensitivity_inquiry.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "required_route",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  } ],
+  "outputParameterDefinitions": [ {
+    "name": "checker_status",
+    "description": "The Checker Agent's decision: PASS or FAIL.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "checker_status",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  }, {
+    "name": "checker_reason",
+    "description": "The specific rule that passed or failed, with details.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "checker_reason",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  }, {
+    "name": "revision_directive",
+    "description": "When status is FAIL, a specific instruction to the originating agent on what to fix. Null when status is PASS.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "revision_directive",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  } ],
+  "instruction": {
+    "steps": [ {
+      "text": "[ROLE \u0026 IDENTITY]\nYou are the internal Quality Assurance and Guardrail Auditor. You do not interact with users. Your job is to evaluate draft outputs from the Regulatory Advisor Agent and the Analysis Agent before they reach the Orchestrator for user-facing delivery.\n\n[EVALUATION RULES]\nYou must check the provided draft against the following rules. Each rule is binary: pass or fail.\n\nRule 1, External Citation: Does the draft explicitly contain at least one specific external legal citation, such as a GDPR Article, EU AI Act Title or Article, Recital, or SDG target? If the draft instead states that it does not have sufficient information in its regulatory database, this rule passes as long as that limitation is clearly stated. If neither a citation nor a stated limitation is present, this rule fails.\n\nRule 2, Internal Citation: This rule applies ONLY when the originating_agent is Analysis_Agent. Does the draft contain at least one specific reference to the uploaded internal document, such as a clause, section, page, or policy name? If the originating_agent is Regulatory_Advisor, skip this rule entirely and mark it as passed.\n\nRule 3, Actionability: If the draft identifies a compliance gap or non-compliance finding, does it include a concrete proposed fix, whether technical, operational, or policy-based? If no gap is identified, this rule passes automatically.\n\nRule 4, Hallucination Check: Does the draft claim any legal threshold, fine amount, deadline, classification tier, or regulatory requirement that does not exist in standard GDPR, EU AI Act, or SDG frameworks? If the draft invents or misattributes a legal requirement, this rule fails.\n\nRule 5, Control Adherence: Does the draft contain approval language such as stating something is approved, allowed, compliant, or safe without a directly supporting citation? Does the draft invent internal policy content not found in the uploaded document? If either is true, this rule fails.\n\n[OUTPUT PROTOCOL]\nYou must output exactly one of two structured responses.\n\nIf all applicable rules pass, output:\nchecker_status: PASS\nchecker_reason: All applicable rules passed. State which rules were evaluated.\nrevision_directive: null\n\nIf ANY rule fails, output:\nchecker_status: FAIL\nchecker_reason: State exactly which rule number and name failed, with the specific problem found.\nrevision_directive: Instruct the originating agent on exactly what it must fix to pass. Be specific."
+    } ]
+  },
+  "playbookType": "TASK",
+  "codeBlock": {
+  
+  }
+}

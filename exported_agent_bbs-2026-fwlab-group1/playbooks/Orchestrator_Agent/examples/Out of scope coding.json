@@ -1,0 +1,25 @@
+{
+  "name": "eacc8508-4af2-4cc8-a019-b5d97785845c",
+  "playbookInput": {
+    "precedingConversationSummary": "USER_QUERY: Can you write Python code to scrape LinkedIn profiles?",
+    "actionParameters": {
+    
+    }
+  },
+  "playbookOutput": {
+    "executionSummary": "Step 1: Check C matched. The user asks for a technical coding task unrelated to privacy or compliance. Output the standard out-of-scope message stating that this falls outside the compliance domain. No sub-agent was called. Steps 2 through 4 were not executed.",
+    "actionParameters": {
+      "attachment_summary": "",
+      "conversation_context": "First message in conversation.",
+      "document_uploaded": false,
+      "known_user_role": "unknown",
+      "requested_action": "out_of_scope",
+      "user_query": "Can you write Python code to scrape LinkedIn profiles?"
+    }
+  },
+  "displayName": "Out of scope coding",
+  "retrievalStrategy": "DEFAULT",
+  "description": "Unrelated technical request. Rejected at Step 1 Check C as out of scope.",
+  "conversationState": "OUTPUT_STATE_OK",
+  "languageCode": "en"
+}

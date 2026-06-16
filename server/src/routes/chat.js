@@ -46,10 +46,16 @@ router.post('/', upload.single('file'), async (req, res, next) => {
     // ── Build the message sent to Dialogflow ───────────────────────
     let fullMessage = message;
     if (fileContext) {
-      fullMessage =
-        `[Uploaded document: ${fileName}]\n` +
-        `---\n${fileContext}\n---\n` +
-        `User question: ${message}`;
+      // IMPORTANT: use exact phrases that match the Orchestrator's intake gate code:
+      // "Document name:" and "Document content:" are the trigger markers in check_intake_gate
+      // and classify_sensitivity actions. This ensures Route A (document audit) is selected.
+      const userRequest = message || 'Please analyze this document for compliance gaps, risks, and regulatory requirements.';
+      const combined =
+        `Document name: ${fileName}\n` +
+        `Document content:\n${fileContext}\n\n` +
+        `User request: ${userRequest}`;
+      // Hard cap at 4800 chars to stay under Dialogflow CX's query limit
+      fullMessage = combined.slice(0, 4800);
     } else if (isImage) {
       fullMessage = `[User uploaded an image: ${fileName}]\n${message}`;
     }
@@ -72,24 +78,64 @@ router.post('/', upload.single('file'), async (req, res, next) => {
 
     // ── Agentic RAG: extract sources from Data Store connection signals ──
     const signals = queryResult.dataStoreConnectionSignals || {};
-    const searchSnippets = signals.searchSnippets || [];
-
-    if (searchSnippets.length === 0) {
-      console.log('[RAG] No searchSnippets found. Raw signals keys:', Object.keys(signals));
-      console.log('[RAG] Full queryResult keys:', Object.keys(queryResult));
+    console.log('[RAG] dataStoreConnectionSignals:', JSON.stringify(signals, null, 2));
+    if (queryResult.traceBlocks?.length) {
+      console.log('[RAG] traceBlocks (first):', JSON.stringify(queryResult.traceBlocks[0], null, 2));
     }
 
-    const rawSources = searchSnippets.map((s) => ({
-      title:   s.documentTitle   || s.document_title   || null,
-      uri:     s.documentUri     || s.document_uri     || null,
-      snippet: s.text || null,
-    }));
+    // Dialogflow CX Data Store response shape has evolved. We probe all known locations:
+    // 1. signals.citedSnippets[]  — current shape (chunkInfo + documentMetadata)
+    // 2. signals.searchSnippets[] — older shape
+    // 3. signals.answerParts[]    — alternative answer parts with citations
+    let rawSources = [];
+
+    if (signals.citedSnippets && signals.citedSnippets.length > 0) {
+      rawSources = signals.citedSnippets.map((s) => {
+        const meta = s.chunkInfo?.documentMetadata || {};
+        return {
+          title:   meta.title || meta.documentTitle || null,
+          uri:     meta.uri   || meta.documentUri   || null,
+          snippet: s.chunkInfo?.content || s.text   || null,
+        };
+      });
+    } else if (signals.searchSnippets && signals.searchSnippets.length > 0) {
+      rawSources = signals.searchSnippets.map((s) => ({
+        title:   s.documentTitle || s.document_title || null,
+        uri:     s.documentUri   || s.document_uri   || null,
+        snippet: s.text || null,
+      }));
+    } else if (signals.answerParts && signals.answerParts.length > 0) {
+      rawSources = signals.answerParts.flatMap((part) =>
+        (part.citations || []).map((c) => ({
+          title:   c.title || null,
+          uri:     c.uri   || null,
+          snippet: part.text || null,
+        }))
+      );
+    }
+
+    if (rawSources.length === 0) {
+      console.log('[RAG] No sources found. signals keys:', Object.keys(signals));
+    }
 
     const uniqueSources = rawSources.filter(
-      (s, i, arr) => arr.findIndex((x) => x.uri === s.uri) === i
+      (s, i, arr) => s.uri && arr.findIndex((x) => x.uri === s.uri) === i
     );
 
-    const replyText = texts.join('\n\n') || 'No response from agent.';
+    // If Dialogflow returns nothing useful (NOT_ENOUGH_INFORMATION), build a fallback
+    let replyText = texts.join('\n\n');
+    if (!replyText && fileContext) {
+      replyText =
+        `I've reviewed **${fileName}**. Here's a summary of what I found:\n\n` +
+        `The document contains ${fileContext.length} characters of content. ` +
+        `However, I wasn't able to generate a detailed compliance analysis from my knowledge base for this specific document. ` +
+        `Please try asking a specific question about the document, for example:\n` +
+        `- "What GDPR obligations does this document mention?"`  + `\n` +
+        `- "Are there any data retention requirements?"`  + `\n` +
+        `- "What are the key risks identified?"`;
+    } else if (!replyText) {
+      replyText = 'No response from agent.';
+    }
 
     // Save bot message with metadata
     store.saveMessage(sessionId, 'bot', replyText, {

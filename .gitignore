@@ -5,3 +5,6 @@ dist/
 *.key.json
 service-account*.json
 bbs-2026-fwlab-group1-74ea507726bf.json
+data/sessions/
+.claude/
+*.log
