@@ -1,0 +1,25 @@
+{
+  "name": "9c5c0ae3-b628-41af-b3f7-d2351a3329bc",
+  "playbookInput": {
+    "precedingConversationSummary": "USER_QUERY: What is a DPIA?",
+    "actionParameters": {
+    
+    }
+  },
+  "playbookOutput": {
+    "executionSummary": "Step 1: No refusal, emergency, or out-of-scope triggers matched. Step 2: Classified as a standard general inquiry. The question asks for a GDPR concept definition and does not involve approval, sensitive data categories, or high-risk topics. Routed to Regulatory Advisor Agent. Not marked for Checker review. Step 3: Checker bypassed. Step 4: Formatted the Regulatory Advisor output into the 5-part response structure with legal citations from the regulatory datastore. Applied response controls: cite_sources, no_legal_advice.",
+    "actionParameters": {
+      "attachment_summary": "",
+      "conversation_context": "First message in conversation.",
+      "document_uploaded": false,
+      "known_user_role": "unknown",
+      "requested_action": "general_inquiry",
+      "user_query": "What is a DPIA?"
+    }
+  },
+  "displayName": "General GDPR definition",
+  "retrievalStrategy": "DEFAULT",
+  "description": "Low-risk general regulatory concept. Routes to Regulatory Advisor, bypasses Checker.",
+  "conversationState": "OUTPUT_STATE_OK",
+  "languageCode": "en"
+}

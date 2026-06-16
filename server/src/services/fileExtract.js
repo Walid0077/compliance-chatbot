@@ -1,7 +1,8 @@
-const pdfParse = require('pdf-parse');
+const _pdfParseModule = require('pdf-parse');
+const pdfParse = typeof _pdfParseModule === 'function' ? _pdfParseModule : _pdfParseModule.default;
 const mammoth = require('mammoth');
 
-const MAX_CHARS = 8000;
+const MAX_CHARS = 3500; // Dialogflow CX query limit is ~5000 chars; leave room for prompt wrapper
 
 /**
  * Extract plain text from an uploaded file buffer.
@@ -33,8 +34,8 @@ async function extractText(buffer, mimetype, originalname) {
       return { text: null, truncated: false };
     }
   } catch (err) {
-    console.error('[fileExtract] extraction error:', err.message);
-    return { text: null, truncated: false };
+    console.error('[fileExtract] extraction error for', originalname, ':', err.message);
+    return { text: null, truncated: false, error: err.message };
   }
 
   // Normalise whitespace

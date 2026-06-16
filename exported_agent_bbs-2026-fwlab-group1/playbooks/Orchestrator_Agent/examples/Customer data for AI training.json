@@ -1,0 +1,25 @@
+{
+  "name": "4c714bac-5b6d-421a-9438-48b2f5d0acae",
+  "playbookInput": {
+    "precedingConversationSummary": "USER_QUERY: Are we allowed to use customer support chats to train our internal AI assistant?",
+    "actionParameters": {
+    
+    }
+  },
+  "playbookOutput": {
+    "executionSummary": "Step 1: No refusal, emergency, or out-of-scope triggers matched. Step 2: Classified as a high-sensitivity general inquiry. The user asks whether something is allowed and the question involves customer data used for AI training. Routed to Regulatory Advisor Agent. Marked for mandatory Checker review. Step 3: Passed the Regulatory Advisor draft to Checker Agent with originating_agent set to Regulatory_Advisor. Checker evaluated Rules 1, 3, 4, and 5 (Rule 2 skipped because originating agent is not Analysis Agent). Checker returned PASS. Step 4: Formatted into 5-part response structure. Applied response controls: cite_sources, no_legal_advice, no_approval_language, state_uncertainty, human_review. Identified DPO as the recommended human reviewer. Did not state that the action is approved or compliant.",
+    "actionParameters": {
+      "attachment_summary": "",
+      "conversation_context": "First message in conversation.",
+      "document_uploaded": false,
+      "known_user_role": "unknown",
+      "requested_action": "general_inquiry",
+      "user_query": "Are we allowed to use customer support chats to train our internal AI assistant?"
+    }
+  },
+  "displayName": "Customer data for AI training",
+  "retrievalStrategy": "DEFAULT",
+  "description": "High-sensitivity permission question involving personal data and AI training. Routes to Advisor with mandatory Checker review.",
+  "conversationState": "OUTPUT_STATE_OK",
+  "languageCode": "en"
+}

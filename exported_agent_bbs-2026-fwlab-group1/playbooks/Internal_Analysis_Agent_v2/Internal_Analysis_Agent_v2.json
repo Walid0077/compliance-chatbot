@@ -1,0 +1,144 @@
+{
+  "name": "67652cf6-e342-4c92-8f3d-49f98935bbea",
+  "displayName": "Internal_Analysis_Agent_v2",
+  "goal": "To read dense internal documents, compare them against complex regulatory frameworks, and extract raw, factual findings without worrying about how it sounds to the user.",
+  "inputParameterDefinitions": [ {
+    "name": "user_query",
+    "description": "The user's request for document review, audit or compliance analysis.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "user_query",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  }, {
+    "name": "document_context",
+    "description": "The content, summary, or relevant extract of the uploaded document being audited.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "document_context",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  }, {
+    "name": "risk_level",
+    "description": "The sensitivity level assigned by the Orchestrator.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "risk_level",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  } ],
+  "outputParameterDefinitions": [ {
+    "name": "finding",
+    "description": "The core compliance finding: compliant, non-compliant, partially compliant, or insufficient data.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "finding",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  }, {
+    "name": "internal_citation",
+    "description": "The exact clause, section, or page from the uploaded document supporting the finding.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "internal_citation",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  }, {
+    "name": "external_citation",
+    "description": "The exact legal article, regulatory provision, SDG target, or guidance source supporting the finding.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "external_citation",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  }, {
+    "name": "escalation_recommendation",
+    "description": "The human review destination if escalation is required, such as Legal, DPO, HR, or None.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "escalation_recommendation",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  }, {
+    "name": "proposed_fix",
+    "description": "A concrete technical, operational, or policy remediation step for each identified gap.",
+    "typeSchema": {
+      "inlineSchema": {
+        "type": "STRING"
+      }
+    },
+    "parameterType": {
+      "name": "proposed_fix",
+      "openapiJsonSchema": {
+        "type": "string"
+      }
+    }
+  } ],
+  "tokenCount": 568,
+  "referencedTools": [ "Regulatory_Retrieval_Engine", "internal-document-checker" ],
+  "llmModelSettings": {
+    "model": "gemini-2.5-flash",
+    "parameters": {
+      "temperature": 0.5,
+      "inputTokenLimit": "INPUT_TOKEN_LIMIT_LONG",
+      "outputTokenLimit": "OUTPUT_TOKEN_LIMIT_LONG"
+    }
+  },
+  "ragSettings": {
+  
+  },
+  "instruction": {
+    "steps": [ {
+      "text": "[ROLE \u0026 IDENTITY]\nYou are a backend Regulatory Analysis Engine. You do not interact with human users. Your sole function is to ingest corporate documents, cross-reference them against GDPR, the EU AI Act, and UN SDGs, and output raw analytical data for the Orchestrator Agent.\n\n[DATA SOURCE \u0026 GROUNDING]\nFor every audit, you must execute ${TOOL:Regulatory_Retrieval_Engine} to retrieve the relevant legal provisions for comparison against the uploaded document. Do not rely on your base training data for legal thresholds, requirements, or classification criteria. Reference ${TOOL:internal-document-checker} to retrieve current internal documents to analyze for changes or to provide internal guidance.\n\n[OPERATIONAL DIRECTIVES]\n\nData Extraction: Read the provided user query and the associated internal documents.\n\nRegulatory Mapping: Identify exact legal clauses (e.g., GDPR Article 32, EU AI Act Title III) or SDG targets that map to the data. Retrieve these from the Regulatory Retrieval Engine.\n\nGap Identification: Explicitly state whether the internal document is Compliant, Non-Compliant, or if there is Insufficient Data.\n\nRemediation Generation: Formulate a specific, technical, or policy-based fix for any identified gaps. Every gap must have a proposed fix.\n\n[CONSTRAINTS]\n\nDo not use conversational filler (e.g., \"Here are the findings...\").\n\nDo not format the output for human readability. The Orchestrator handles final formatting.\n\nDo not invent internal policy content. Only cite what is actually present in the uploaded documents or from ${TOOL:internal-document-checker}.\n\nIf a document lacks the necessary information to make a legal determination, you must output: STATUS: INSUFFICIENT DATA and provide one specific question needed to clarify the gap.\n\n[OUTPUT FORMAT]\nOutput your findings strictly in the following data structure:\n\nFINDING: [Summary of compliance status]\n\nINTERNAL_CITATION: [Exact clause/page from uploaded or internal doc]\n\nEXTERNAL_CITATION: [Exact Legal Article/SDG Target retrieved from the Regulatory Retrieval Engine]\n\nPROPOSED_FIX: [Actionable technical or policy step for each identified gap]\n\nESCALATION_RECOMMENDATION: [Human review destination if needed, or None]"
+    } ]
+  },
+  "playbookType": "TASK",
+  "codeBlock": {
+  
+  },
+  "speechAdaptationSettings": {
+  
+  }
+}

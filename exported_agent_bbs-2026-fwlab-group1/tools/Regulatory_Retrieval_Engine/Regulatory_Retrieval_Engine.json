@@ -1,0 +1,41 @@
+{
+  "name": "cbd0cae6-6d6d-4f9d-a417-54d2dced49ae",
+  "displayName": "Regulatory_Retrieval_Engine",
+  "description": "Use this tool to retrieve relevant passages from the curated regulatory and compliance knowledge base. The datastore includes selected legal, regulatory, and internal policy materials related to GDPR, the EU AI Act, AI governance, data protection, organizational compliance, and related risk controls. Use this tool when answering questions that require support from official rules, regulator guidance, company policies, or documented compliance procedures. Do not use this tool for general business strategy, technical coding help, personal advice, or unsupported legal conclusions. If retrieved sources are insufficient, conflicting, outdated, or high-risk, state the limitation and escalate to Legal, the DPO, HR, or compliance leadership.",
+  "dataStoreSpec": {
+    "dataStoreConnections": [ {
+      "dataStoreType": "UNSTRUCTURED",
+      "dataStore": "projects/953045768779/locations/eu/collections/default_collection/dataStores/data-store-test_1779908106973",
+      "documentProcessingMode": "DOCUMENTS",
+      "engineType": "CHAT_ENGINE",
+      "connectorConfig": {
+      
+      },
+      "createTime": {
+        "seconds": 1779908142,
+        "nanos": 667248000
+      },
+      "displayName": "data_store_test",
+      "dialogflowAddTime": {
+        "seconds": 1779908244,
+        "nanos": 448000000
+      }
+    } ],
+    "models": {
+      "summarizationModel": {
+        "model": "default"
+      },
+      "rewriterModel": {
+        "model": "default"
+      }
+    },
+    "groundingSettings": {
+    
+    },
+    "payloadSettings": {
+    
+    },
+    "mode": "MODE_DEFAULT"
+  },
+  "toolType": "CUSTOMIZED_TOOL"
+}

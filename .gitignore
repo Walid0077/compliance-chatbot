@@ -11,3 +11,6 @@ server/credentials/
 *service-account*.json
 server/src/bbs-*.json
 bbs-2026-fwlab-group1-74ea507726bf.json
+data/sessions/
+.claude/
+*.log

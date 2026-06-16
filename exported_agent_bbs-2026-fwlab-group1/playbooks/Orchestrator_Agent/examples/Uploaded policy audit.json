@@ -1,0 +1,25 @@
+{
+  "name": "17d48992-3512-4650-abce-7a0735bfc80b",
+  "playbookInput": {
+    "precedingConversationSummary": "USER_QUERY: Please review this uploaded data retention policy against GDPR.",
+    "actionParameters": {
+    
+    }
+  },
+  "playbookOutput": {
+    "executionSummary": "Step 1: No refusal, emergency, or out-of-scope triggers matched. Step 2: Route A matched. The user uploaded a document and explicitly asks to review an internal policy against GDPR. Routed to Analysis Agent with document context. Marked for mandatory Checker review. Step 3: Passed the Analysis Agent draft to Checker Agent with originating_agent set to Analysis_Agent. Checker evaluated all five rules including Rule 2 (internal citation required for document audits). Checker returned PASS. Step 4: Formatted into 5-part response structure. Applied response controls: cite_sources, no_legal_advice, no_policy_invention, include_practical_next_step. VERIFICATION ANCHOR includes both external legal citations from the regulatory datastore and internal citations from the uploaded document.",
+    "actionParameters": {
+      "attachment_summary": "Data retention policy document for GDPR compliance review.",
+      "conversation_context": "User uploaded a data retention policy document.",
+      "document_uploaded": true,
+      "known_user_role": "unknown",
+      "requested_action": "document_audit",
+      "user_query": "Please review this uploaded data retention policy against GDPR."
+    }
+  },
+  "displayName": "Uploaded policy audit",
+  "retrievalStrategy": "DEFAULT",
+  "description": "Document audit request. Routes to Analysis Agent with mandatory Checker review before delivery.",
+  "conversationState": "OUTPUT_STATE_OK",
+  "languageCode": "en"
+}

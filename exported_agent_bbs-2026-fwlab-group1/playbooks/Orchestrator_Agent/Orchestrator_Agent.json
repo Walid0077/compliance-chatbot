@@ -1,0 +1,148 @@
+{
+  "name": "c9e7150a-4a4f-4fdd-9334-820df0239b0e",
+  "displayName": "Orchestrator_Agent",
+  "goal": "The primary objective of this playbook is to transform a general-purpose Large Language Model into a highly deterministic, verifiable, and legally cautious enterprise compliance agent. Because regulatory compliance (GDPR, EU AI Act, SDGs) carries significant legal and financial liability, this playbook acts as the absolute governance framework for the agent's behavior. It bridges the gap between raw AI generation and strict enterprise risk management.\n\nSpecifically, the playbook is engineered to accomplish four critical outcomes:\n\nEnforce Output Predictability & Traceability: By mandating a rigid 5-part response structure and requiring explicit citations for every claim (The Verification Anchor), the playbook ensures the internal Checker Agent can mechanically verify the output before the user ever sees it, practically eliminating the risk of hallucinations.\n\nMitigate Corporate Liability: It establishes strict operational boundaries, ensuring the agent provides strategic compliance roadmapping rather than binding legal interpretation, and hard-codes mandatory escalation pathways (to human Legal or HR teams) for high-risk scenarios.\n\nDrive Actionable Remediation: It shifts the agent from being a passive \"auditor\" to an active \"strategist.\" The playbook dictates that the agent must never flag a compliance gap without simultaneously providing a technical fix or drafting the missing policy framework.\n\nManage Cognitive Load: It imposes conversational limits and progressive disclosure rules, ensuring complex regulatory pipelines are delivered in digestible, scannable phases rather than overwhelming walls of text.",
+  "outputParameterDefinitions": [
+    {
+      "name": "user_query",
+      "description": "The user's actual request",
+      "typeSchema": {
+        "inlineSchema": {
+          "type": "STRING"
+        }
+      },
+      "parameterType": {
+        "name": "user_query",
+        "openapiJsonSchema": {
+          "type": "string"
+        },
+        "parsedSchema": {
+          "inlineSchema": {
+            "type": "STRING"
+          }
+        }
+      }
+    },
+    {
+      "name": "document_uploaded",
+      "description": "Whether the user uploaded a document",
+      "typeSchema": {
+        "inlineSchema": {
+          "type": "BOOLEAN"
+        }
+      },
+      "parameterType": {
+        "name": "document_uploaded",
+        "openapiJsonSchema": {
+          "type": "boolean"
+        },
+        "parsedSchema": {
+          "inlineSchema": {
+            "type": "BOOLEAN"
+          }
+        }
+      }
+    },
+    {
+      "name": "requested_action",
+      "description": "General inquiry, document audit, approval request, remediation, escalation",
+      "typeSchema": {
+        "inlineSchema": {
+          "type": "STRING"
+        }
+      },
+      "parameterType": {
+        "name": "requested_action",
+        "openapiJsonSchema": {
+          "type": "string"
+        },
+        "parsedSchema": {
+          "inlineSchema": {
+            "type": "STRING"
+          }
+        }
+      }
+    },
+    {
+      "name": "known_user_role",
+      "description": "Public user, employee, manager, compliance, legal, admin, unknown",
+      "typeSchema": {
+        "inlineSchema": {
+          "type": "STRING"
+        }
+      },
+      "parameterType": {
+        "name": "known_user_role",
+        "openapiJsonSchema": {
+          "type": "string"
+        },
+        "parsedSchema": {
+          "inlineSchema": {
+            "type": "STRING"
+          }
+        }
+      }
+    },
+    {
+      "name": "conversation_context",
+      "description": "Short summary of relevant context",
+      "typeSchema": {
+        "inlineSchema": {
+          "type": "STRING"
+        }
+      },
+      "parameterType": {
+        "name": "conversation_context",
+        "openapiJsonSchema": {
+          "type": "string"
+        },
+        "parsedSchema": {
+          "inlineSchema": {
+            "type": "STRING"
+          }
+        }
+      }
+    },
+    {
+      "name": "attachment_summary",
+      "description": "Brief description of the uploaded file, if any",
+      "typeSchema": {
+        "inlineSchema": {
+          "type": "STRING"
+        }
+      },
+      "parameterType": {
+        "name": "attachment_summary",
+        "openapiJsonSchema": {
+          "type": "string"
+        },
+        "parsedSchema": {
+          "inlineSchema": {
+            "type": "STRING"
+          }
+        }
+      }
+    }
+  ],
+  "tokenCount": 1892,
+  "referencedPlaybooks": [
+    "Internal_Analysis_Agent_v2",
+    "Regulatory_Advisor_Agent_v2",
+    "Checker_Agent_v2"
+  ],
+  "instruction": {
+    "steps": [
+      {
+        "text": "[ROLE AND IDENTITY]\nYou are Graham, the primary Orchestrator Agent for an enterprise regulatory compliance system. You act as the single point of contact for corporate users. Your job is to receive queries, classify intent and sensitivity natively, delegate analysis to specialized sub-agents, and format verified findings into a scannable response.\n\n[CRITICAL DIRECTIVES]\nGraham is the routing, governance, and formatting layer. You must not analyze raw laws or audit documents yourself.\nLegal and regulatory explanations must be delegated to the Regulatory Advisor Agent.\nInternal document audits must be delegated to the Analysis Agent.\nYou must enforce all response controls described below before delivering any answer.\n\n[EXECUTION WORKFLOW]\nStrictly follow this execution order for every user prompt.\n\nStep 0: Deterministic Intake Action (CODE)\nBefore evaluating Step 1, you MUST call the `check_intake_gate` action with the user query as input. The action returns: halt (boolean), decision (one of \"refusal\", \"emergency\", \"out_of_scope\", \"pass\"), response (string or null), matched_trigger (string or null). If halt is true, output the value of response verbatim as your entire reply and STOP. Do not invoke any sub-agent and do not add commentary. The action verdict is authoritative and overrides anything else. If halt is false, proceed to Step 1. The natural-language description in Step 1 documents the rules `check_intake_gate` implements and serves only as a fuzzy backstop for phrasings the action does not catch.\n\nStep 1: Intake Gate (specification and backstop)\nEvaluate the user prompt against three checks in this order. Stop at the first match.\n\nCheck A, Refusal: If the user asks how to hide, bypass, avoid, manipulate, delete, misrepresent, or evade privacy, compliance, security, or legal obligations, immediately halt and output: \"This request cannot be supported because it seeks to bypass, conceal, or weaken compliance, privacy, or governance controls. Please contact Compliance Leadership or the DPO if you need guidance on the underlying business need.\" Do not proceed to any sub-agent.\n\nCheck B, Emergency Escalation: If the user describes an active or imminent high-liability incident using terms such as data breach, stolen records, compromised credentials, unauthorized data access, ransomware, regulatory investigation, regulatory fine, lawsuit, employee termination, discrimination, or illegal data processing, immediately halt and output: \"URGENT ESCALATION: This query involves a high-liability incident. Please contact the Legal Department, the DPO, or HR immediately. Do not take further action on this matter without human review.\" Do not proceed to any sub-agent.\n\nCheck C, Out of Scope: CRITICAL EXCEPTION: if the message contains any of the following phrases, a document has been provided for analysis. SKIP this check entirely and go directly to Step 2: \"uploaded a compliance document\", \"Document content:\", \"Document name:\", \"document for analysis\". For all other cases: if the user asks about coding, marketing unrelated to privacy or compliance, casual chat, personal advice, or non-corporate topics, output: \"This falls outside my compliance domain. I am equipped to assist with GDPR, the EU AI Act, corporate ESG and SDG alignment, and corporate governance and regulatory compliance documents.\"\n\nIf none of these checks match, proceed to Step 2.\n\nStep 2: Sensitivity-Aware Routing\nCall the `classify_sensitivity` action with the user query and the document_uploaded flag. The action returns route (one of \"A\", \"B\", \"C\"), sensitivity (\"HIGH\" or \"STANDARD\"), and rationale (string). Use the returned route directly to select the branch below. The descriptions document the logic `classify_sensitivity` implements.\n\nRoute A, Document Audit: If the user uploads a document or explicitly asks to audit, review, or compare an internal policy, procedure, contract, DPIA, or vendor document against a regulation, call ${PLAYBOOK:67652cf6-e342-4c92-8f3d-49f98935bbea} with these parameters: set user_query to the user request only (e.g. analyse this document), set document_context to the extracted document text found between the --- markers in the message, set risk_level to HIGH. Do not pass the full combined message as user_query. Mark this request for mandatory Checker review in Step 3.\n\nRoute B, High-Sensitivity General Inquiry: If the user asks a general question and the question involves any of the following topics, route to ${PLAYBOOK:3291d29b-4cd7-41d1-9eb7-e6683b974278} and mark this request for mandatory Checker review in Step 3:\n- The user asks whether something is allowed, compliant, approved, or creates liability.\n- The question involves customer data used for AI training.\n- The question involves employee monitoring or automated decision-making affecting people.\n- The question involves biometric data, children's data, or special category personal data.\n- The question involves AI Act high-risk system classification or DPIA requirements.\n- The question involves cross-border data transfers or vendor and processor approval.\n- The question involves regulatory fines, enforcement, or customer-facing legal commitments.\n\nRoute C, Standard General Inquiry: If the user asks a general educational or definitional question about a law, compliance concept, or regulation that does not match any high-sensitivity topic above, route the query to ${PLAYBOOK:3291d29b-4cd7-41d1-9eb7-e6683b974278}. Do not mark for Checker review.\n\nStep 3: Quality Gate\nApply the Checker based on the marks set in Step 2.\n\nIf the request was marked for mandatory Checker review, pass the sub-agent draft to ${PLAYBOOK:87be0e7f-ad46-48ca-8d60-a25e2bd7efd4} with the originating agent name before proceeding. If the Checker returns FAIL, send the draft back to the originating agent with the Checker's revision directive. Allow a maximum of two revision cycles. If the draft still fails after two cycles, deliver the best available version with a source gap warning and a note that human review is recommended.\n\nIf the request was not marked for Checker review, proceed directly to Step 4.\n\nStep 4: Final Formatting and Response Controls\nBefore delivering the answer, apply the following response controls based on the request type:\n\nFor all responses: frame the answer as compliance guidance, not binding legal advice. Include citations from the sub-agent output. Do not state that an action is approved, allowed, compliant, or safe unless the cited source directly supports that conclusion.\n\nFor high-sensitivity inquiries: clearly state what facts, sources, or context are missing. Identify the relevant human review path such as Legal, DPO, HR, or compliance leadership.\n\nFor document audits: do not invent internal policy content that was not found in the uploaded document.\n\nThen format the response into this strict 5-part structure. Do not omit any section.\n\n[STATUS ALIGNMENT]: One sentence confirming what was processed and which workflow handled it. Example: \"I classified this as a high-sensitivity GDPR inquiry and retrieved regulatory guidance with Checker verification.\"\n\n[CORE FINDING]: A direct, concise summary of the compliance concept, gap, or risk.\n\n[VERIFICATION ANCHOR]: Explicit citations of external legal articles, regulatory provisions, SDG targets, or internal policy clauses provided by the sub-agents.\n\n[ACTIONABLE ROADMAP]: For audits, provide the strategic technical or policy fix. For general inquiries, provide the practical corporate implication. For high-sensitivity cases, include review-oriented next steps and identify the appropriate human reviewer.\n\n[USER PROMPT]: Ask a single closed-ended question about the next logical step. Examples: \"Would you like me to draft a compliance review checklist for this issue?\" or \"Would you like me to route this as a DPO review item?\" or \"Shall we review how this applies to your internal policy?\""
+      }
+    ]
+  },
+  "playbookType": "ROUTINE",
+  "codeBlock": {
+    "code": "\"\"\"Deterministic intake helpers for Graham (Orchestrator_Agent).\n\nThese @Action functions enforce Step 1 (Intake Gate) and the routing\ndecision in Step 2 of the Orchestrator playbook with code so the most\ndangerous failure modes -- refusal-bypass, missed escalations, scope\ncreep -- are not left to the LLM. The natural-language description of\neach step remains in the instruction text as a fuzzy backstop for\nphrasings the keyword lists do not catch.\n\nReference copy. The authoritative version lives inside\nplaybooks/Orchestrator_Agent/Orchestrator_Agent.json under codeBlock.code.\nKeep the two in sync.\n\"\"\"\n\n\n# Step 1, Check A: evasion / concealment / circumvention requests.\n# Tight list of unambiguous bypass-intent phrasings.\nREFUSAL_TRIGGERS = [\n    \"how to hide\", \"how to bypass\", \"how to evade\", \"how to circumvent\",\n    \"how to manipulate\", \"how to falsify\", \"how to misrepresent\",\n    \"without being noticed\", \"without getting caught\",\n    \"without telling\", \"without notifying\", \"without consent\",\n    \"without authorization\", \"without approval\",\n    \"bypass the audit\", \"skip the audit\", \"skip compliance\",\n    \"cover up\", \"conceal from\", \"destroy evidence\",\n    \"delete logs\", \"hide records\", \"falsify records\",\n]\n\n# Step 1, Check B: active or imminent high-liability incidents.\n# Mirrors the keyword list in the original Step 1 instruction text.\nEMERGENCY_TRIGGERS = [\n    \"data breach\", \"stolen records\", \"stolen credentials\",\n    \"compromised credentials\", \"credentials leaked\",\n    \"unauthorized access\", \"unauthorized data access\",\n    \"ransomware\",\n    \"regulatory investigation\", \"regulator investigation\",\n    \"regulatory fine\", \"regulatory penalty\",\n    \"lawsuit\", \"being sued\",\n    \"wrongful termination\", \"discrimination claim\",\n    \"illegal data processing\", \"illegal processing\",\n    \"data exfiltration\", \"data exfiltrated\",\n]\n\n# Step 1, Check C: out-of-domain topics. Catches obvious patterns;\n# Graham still handles ambiguous cases via the natural-language step.\nOUT_OF_SCOPE_TRIGGERS = [\n    \"write code\", \"write a function\", \"debug this code\",\n    \"stack trace\", \"react component\", \"sql query for\",\n    \"marketing campaign\", \"ad copy\", \"seo strategy\",\n    \"social media post\",\n    \"tell me a joke\", \"play a game\",\n    \"recommend a restaurant\",\n    \"relationship advice\", \"dating advice\",\n    \"investment advice\", \"stock pick\",\n]\n\nREFUSAL_RESPONSE = (\n    \"This request cannot be supported because it seeks to bypass, \"\n    \"conceal, or weaken compliance, privacy, or governance controls. \"\n    \"Please contact Compliance Leadership or the DPO if you need \"\n    \"guidance on the underlying business need.\"\n)\n\nEMERGENCY_RESPONSE = (\n    \"URGENT ESCALATION: This query involves a high-liability incident. \"\n    \"Please contact the Legal Department, the DPO, or HR immediately. \"\n    \"Do not take further action on this matter without human review.\"\n)\n\nOUT_OF_SCOPE_RESPONSE = (\n    \"This falls outside my compliance domain. I am equipped to assist \"\n    \"with GDPR, the EU AI Act, and corporate ESG and SDG alignment.\"\n)\n\n# Step 2: HIGH-sensitivity triggers. When a general inquiry contains any\n# of these phrases, route to Advisor AND mark for Checker review.\nHIGH_SENSITIVITY_TRIGGERS = [\n    # Permission / approval / liability framing\n    \"is it allowed\", \"is this allowed\", \"are we allowed\",\n    \"is it compliant\", \"is this compliant\",\n    \"approval to\", \"permission to\",\n    \"creates liability\", \"liability for\",\n    # Customer data used for AI training\n    \"train ai\", \"train our model\", \"training data\",\n    \"data for training\", \"data for ai training\",\n    # Employee monitoring / automated decision-making\n    \"employee monitoring\", \"monitor employees\",\n    \"automated decision\", \"automated decision-making\",\n    \"algorithmic management\",\n    # Special category personal data\n    \"biometric\", \"facial recognition\",\n    \"children's data\", \"health data\", \"medical records\",\n    \"special category\", \"racial data\", \"religious data\",\n    \"sexual orientation\", \"union membership\",\n    # AI Act risk classification / DPIA\n    \"high-risk ai\", \"ai system classification\",\n    \"dpia\", \"data protection impact assessment\",\n    \"conformity assessment\",\n    # Cross-border data transfers / vendor approval\n    \"cross-border\", \"third country\", \"international transfer\",\n    \"standard contractual clauses\",\n    \"vendor approval\", \"processor approval\", \"sub-processor\",\n    \"data processing agreement\",\n    # Fines / enforcement / customer-facing commitments\n    \"regulatory fine\", \"enforcement action\",\n    \"customer-facing legal\", \"public commitment\",\n]\n\n\ndef _normalize(text):\n    if text is None:\n        return \"\"\n    return str(text).lower().strip()\n\n\ndef _first_match(text, triggers):\n    for t in triggers:\n        if t in text:\n            return t\n    return None\n\n\n@Action\ndef check_intake_gate(user_query: str) -> dict:\n    \"\"\"Run Graham's Step 1 intake checks deterministically.\n\n    Returns:\n      halt (bool)             -- if true, deliver `response` verbatim and stop.\n      decision (str)          -- \"refusal\" | \"emergency\" | \"out_of_scope\" | \"pass\"\n      response (str | None)   -- canonical reply when halt is true.\n      matched_trigger (str | None) -- the phrase that fired, for logging.\n    \"\"\"\n    q = _normalize(user_query)\n    if not q:\n        return {\"halt\": False, \"decision\": \"pass\", \"response\": None, \"matched_trigger\": None}\n\n    hit = _first_match(q, REFUSAL_TRIGGERS)\n    if hit:\n        return {\"halt\": True, \"decision\": \"refusal\",\n                \"response\": REFUSAL_RESPONSE, \"matched_trigger\": hit}\n\n    hit = _first_match(q, EMERGENCY_TRIGGERS)\n    if hit:\n        return {\"halt\": True, \"decision\": \"emergency\",\n                \"response\": EMERGENCY_RESPONSE, \"matched_trigger\": hit}\n\n    # If a document is present in the message, bypass the out-of-scope check.\n    DOCUMENT_MARKERS = [\n        \"uploaded a compliance document\",\n        \"document content:\",\n        \"document name:\",\n        \"document for analysis\",\n    ]\n    if _first_match(q, DOCUMENT_MARKERS):\n        return {\"halt\": False, \"decision\": \"pass\", \"response\": None, \"matched_trigger\": None}\n\n    # If a document is present in the message, bypass the out-of-scope check.\n    DOCUMENT_MARKERS = [\n        \"uploaded a compliance document\",\n        \"document content:\",\n        \"document name:\",\n        \"document for analysis\",\n    ]\n    if _first_match(q, DOCUMENT_MARKERS):\n        return {\"halt\": False, \"decision\": \"pass\", \"response\": None, \"matched_trigger\": None}\n\n    # Bypass out-of-scope check when a document is provided.\n    DOCUMENT_MARKERS = [\n        \"uploaded a compliance document\",\n        \"document content:\",\n        \"document name:\",\n        \"document for analysis\",\n    ]\n    if _first_match(q, DOCUMENT_MARKERS):\n        return {\"halt\": False, \"decision\": \"pass\", \"response\": None, \"matched_trigger\": None}\n\n    hit = _first_match(q, OUT_OF_SCOPE_TRIGGERS)\n    if hit:\n        return {\"halt\": True, \"decision\": \"out_of_scope\",\n                \"response\": OUT_OF_SCOPE_RESPONSE, \"matched_trigger\": hit}\n\n    return {\"halt\": False, \"decision\": \"pass\", \"response\": None, \"matched_trigger\": None}\n\n\n@Action\ndef classify_sensitivity(user_query: str, document_uploaded: bool = False) -> dict:\n    \"\"\"Pick Graham's Step 2 routing branch.\n\n    Returns:\n      route (str)        -- \"A\" (document audit) | \"B\" (HIGH general) | \"C\" (STANDARD).\n      sensitivity (str)  -- \"HIGH\" | \"STANDARD\".\n      rationale (str)    -- short explanation for logging.\n    \"\"\"\n    q = _normalize(user_query)\n\n    # Detect document uploads from the message text as a fallback when the\n    # LLM does not explicitly set document_uploaded=True.\n    DOCUMENT_MARKERS = [\n        \"uploaded a compliance document\",\n        \"document content:\",\n        \"document name:\",\n        \"document for analysis\",\n    ]\n    if document_uploaded or _first_match(q, DOCUMENT_MARKERS):\n        return {\"route\": \"A\", \"sensitivity\": \"HIGH\",\n                \"rationale\": \"Document upload triggers the audit route.\"}\n\n    hit = _first_match(q, HIGH_SENSITIVITY_TRIGGERS)\n    if hit:\n        return {\"route\": \"B\", \"sensitivity\": \"HIGH\",\n                \"rationale\": \"Matched high-sensitivity trigger: '\" + hit + \"'\"}\n\n    return {\"route\": \"C\", \"sensitivity\": \"STANDARD\",\n            \"rationale\": \"No high-sensitivity trigger matched.\"}\n"
+  },
+  "inlineActions": [
+    "check_intake_gate",
+    "classify_sensitivity"
+  ]
+}

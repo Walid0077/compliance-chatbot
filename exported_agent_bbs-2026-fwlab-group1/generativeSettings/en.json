@@ -1,0 +1,67 @@
+{
+  "fallbackSettings": {
+    "selectedPrompt": "Default"
+  },
+  "generativeSafetySettings": {
+    "bannedPhrases": [ {
+      "text": "Alec",
+      "languageCode": "en"
+    } ],
+    "raiSettings": {
+      "categoryFilters": [ {
+        "category": "DANGEROUS_CONTENT",
+        "filterLevel": "BLOCK_FEW"
+      }, {
+        "category": "SEXUALLY_EXPLICIT_CONTENT",
+        "filterLevel": "BLOCK_SOME"
+      }, {
+        "category": "HARASSMENT",
+        "filterLevel": "BLOCK_SOME"
+      }, {
+        "category": "HATE_SPEECH",
+        "filterLevel": "BLOCK_SOME"
+      } ]
+    },
+    "defaultRaiSettings": {
+      "categoryFilters": [ {
+        "category": "DANGEROUS_CONTENT",
+        "filterLevel": "BLOCK_FEW"
+      }, {
+        "category": "SEXUALLY_EXPLICIT_CONTENT",
+        "filterLevel": "BLOCK_SOME"
+      }, {
+        "category": "HARASSMENT",
+        "filterLevel": "BLOCK_SOME"
+      }, {
+        "category": "HATE_SPEECH",
+        "filterLevel": "BLOCK_SOME"
+      } ]
+    },
+    "promptSecuritySettings": {
+      "sensitivityLevel": 3,
+      "minQueryLength": 15
+    }
+  },
+  "languageCode": "en",
+  "knowledgeConnectorSettings": {
+    "groundingSettings": {
+      "groundingConfidence": "MEDIUM"
+    },
+    "mainLlmConfig": {
+    
+    }
+  },
+  "llmModelSettings": {
+    "model": "gemini-2.5-flash",
+    "parameters": {
+      "temperature": 0.2,
+      "inputTokenLimit": "INPUT_TOKEN_LIMIT_MEDIUM",
+      "outputTokenLimit": "OUTPUT_TOKEN_LIMIT_MEDIUM"
+    }
+  },
+  "playbookSettings": {
+    "memoryRetentionSettings": {
+    
+    }
+  }
+}

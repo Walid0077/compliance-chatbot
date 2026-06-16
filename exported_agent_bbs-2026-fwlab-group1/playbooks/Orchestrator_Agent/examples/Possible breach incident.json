@@ -1,0 +1,25 @@
+{
+  "name": "b143c73b-4117-4e12-bed9-e8f82a4a6968",
+  "playbookInput": {
+    "precedingConversationSummary": "USER_QUERY: We think a vendor exposed customer records last night. What should we do?",
+    "actionParameters": {
+    
+    }
+  },
+  "playbookOutput": {
+    "executionSummary": "Step 1: Check A did not match. Check B matched. The user describes an active or imminent data breach involving a vendor and customer records. This triggers the emergency escalation pathway. Output the urgent escalation message directing the user to contact the Legal Department, the DPO, or HR immediately. No sub-agent was called. Steps 2 through 4 were not executed.",
+    "actionParameters": {
+      "attachment_summary": "",
+      "conversation_context": "First message in conversation.",
+      "document_uploaded": false,
+      "known_user_role": "unknown",
+      "requested_action": "escalation",
+      "user_query": "We think a vendor exposed customer records last night. What should we do?"
+    }
+  },
+  "displayName": "Possible breach incident",
+  "retrievalStrategy": "DEFAULT",
+  "description": "Active incident report. Emergency escalation at Step 1 Check B without calling any sub-agent.",
+  "conversationState": "OUTPUT_STATE_OK",
+  "languageCode": "en"
+}
