@@ -1,0 +1,19 @@
+# Project requirements
+#
+# This is a Node.js project. JavaScript dependencies are installed from:
+# - client/package-lock.json
+# - server/package-lock.json
+#
+# Install them with:
+# - cd client && npm ci
+# - cd server && npm ci
+
+# Node.js >=18
+# npm >=9
+
+# Local configuration required for the server
+# server/.env
+# server/credentials/service-account.json
+
+# External service required at runtime
+# Google Cloud Dialogflow CX agent access

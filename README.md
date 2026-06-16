@@ -4,6 +4,8 @@ This project has a Vite client and an Express server. Secrets and deployment-spe
 
 ## First Run
 
+Review the top-level `requirements.txt` for runtime prerequisites. This is a Node.js project, so package versions are locked in `client/package-lock.json` and `server/package-lock.json`.
+
 Install dependencies:
 
 ```bash
