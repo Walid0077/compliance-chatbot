@@ -36,7 +36,7 @@ export default function ChatWindow({ password, onUnauthorized }) {
     <div className="chat-window">
       <div className="chat-topbar">
         <div className="chat-topbar-info">
-          <span className="chat-topbar-title">Compliance Assistant</span>
+          <span className="chat-topbar-title">GrahamAI</span>
           <span className="chat-topbar-subtitle">
             Session · {msgCount} messages{totalSources > 0 ? ` · ${totalSources} source${totalSources !== 1 ? 's' : ''}` : ''}
           </span>

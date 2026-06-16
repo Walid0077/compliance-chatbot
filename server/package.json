@@ -7,10 +7,19 @@
     "predev": "node scripts/setup.js --check",
     "dev": "nodemon src/index.js",
     "prestart": "node scripts/setup.js --check",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "seed": "node scripts/seed-fixtures.js",
+    "seed:force": "node scripts/seed-fixtures.js --force",
+    "seed:docs": "node scripts/seed-fixtures.js --with-docs",
+    "unseed": "node scripts/seed-fixtures.js --unseed",
+    "smoke": "node scripts/smoke-test.js",
+    "smoke:chat": "node scripts/smoke-test.js --chat",
+    "smoke:cite": "node scripts/smoke-citations.js",
+    "smoke:cite:chat": "node scripts/smoke-citations.js --chat"
   },
   "dependencies": {
     "@google-cloud/dialogflow-cx": "^5.8.2",
+    "@google-cloud/storage": "^7.21.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",

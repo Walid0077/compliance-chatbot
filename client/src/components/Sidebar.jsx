@@ -14,7 +14,7 @@ export default function Sidebar({ onLogout }) {
       <div className="sidebar-logo">
         <img src={logo} alt="Graham logo" className="sidebar-logo-img" />
         <div className="sidebar-logo-text">
-          <span className="sidebar-logo-title">ComplianceAI</span>
+          <span className="sidebar-logo-title">GrahamAI</span>
           <span className="sidebar-logo-subtitle">Powered by Dialogflow CX</span>
         </div>
       </div>

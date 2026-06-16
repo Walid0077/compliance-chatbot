@@ -1,22 +1,41 @@
 import { useDashboard } from '../hooks/useDashboard';
+import EscalationQueue from '../components/EscalationQueue';
+import DocumentsPanel from '../components/DocumentsPanel';
 import {
   Chart as ChartJS,
   CategoryScale, LinearScale, PointElement,
-  LineElement, ArcElement, Tooltip, Legend, Filler,
+  LineElement, BarElement, ArcElement, Tooltip, Legend, Filler,
 } from 'chart.js';
-import { Line, Pie } from 'react-chartjs-2';
+import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import { format } from 'date-fns';
 import './DashboardPage.css';
 
 ChartJS.register(
   CategoryScale, LinearScale, PointElement,
-  LineElement, ArcElement, Tooltip, Legend, Filler
+  LineElement, BarElement, ArcElement, Tooltip, Legend, Filler
 );
 
-const CHART_COLORS = [
-  '#6366f1','#8b5cf6','#38bdf8','#10d97e',
-  '#f59e0b','#ef4444','#a78bfa','#34d399',
-];
+const DECISION_COLORS = {
+  pass: '#10d97e',
+  emergency: '#ef4444',
+  refusal: '#f59e0b',
+  out_of_scope: '#8b5cf6',
+  unknown: '#4a5568',
+};
+
+const SENSITIVITY_COLORS = {
+  HIGH: '#ef4444',
+  STANDARD: '#38bdf8',
+  'N/A': '#4a5568',
+};
+
+const DECISION_LABELS = {
+  pass: 'Pass through',
+  emergency: 'Emergency halt',
+  refusal: 'Refusal',
+  out_of_scope: 'Out of scope',
+  unknown: 'Unknown',
+};
 
 function StatCard({ icon, iconClass, value, label, sub }) {
   return (
@@ -29,6 +48,38 @@ function StatCard({ icon, iconClass, value, label, sub }) {
       </div>
     </div>
   );
+}
+
+function pickDecisionPie(distribution = []) {
+  const labels = distribution.map((d) => DECISION_LABELS[d.key] || d.key);
+  const colors = distribution.map((d) => DECISION_COLORS[d.key] || '#6366f1');
+  return {
+    labels,
+    datasets: [{
+      data: distribution.map((d) => d.count),
+      backgroundColor: colors,
+      borderColor: '#0e1320',
+      borderWidth: 2,
+    }],
+  };
+}
+
+function pickSensitivityBar(distribution = []) {
+  const order = ['HIGH', 'STANDARD', 'N/A'];
+  const sorted = order
+    .map((k) => distribution.find((d) => d.key === k))
+    .filter(Boolean);
+  return {
+    labels: sorted.map((d) => d.key),
+    datasets: [{
+      label: 'Inquiries',
+      data: sorted.map((d) => d.count),
+      backgroundColor: sorted.map((d) => SENSITIVITY_COLORS[d.key] || '#6366f1'),
+      borderRadius: 6,
+      borderSkipped: false,
+      barThickness: 48,
+    }],
+  };
 }
 
 export default function DashboardPage({ password }) {
@@ -46,18 +97,18 @@ export default function DashboardPage({ password }) {
 
   const hasData = data && data.totalSessions > 0;
 
-  // Confidence trend chart
-  const trendLabels = (data?.confidenceTrend || []).map((d) =>
+  // Source-coverage trend chart. coverage is 0..1; render as a percent.
+  const trendLabels = (data?.sourceCoverageTrend || []).map((d) =>
     format(new Date(d.date + 'T00:00:00'), 'MMM d')
   );
-  const trendValues = (data?.confidenceTrend || []).map((d) =>
-    parseFloat((d.avgConfidence * 100).toFixed(1))
+  const trendValues = (data?.sourceCoverageTrend || []).map((d) =>
+    parseFloat((d.coverage * 100).toFixed(1))
   );
 
   const lineData = {
     labels: trendLabels,
     datasets: [{
-      label: 'Avg Confidence %',
+      label: 'Source coverage %',
       data: trendValues,
       fill: true,
       borderColor: '#6366f1',
@@ -81,7 +132,7 @@ export default function DashboardPage({ password }) {
         titleColor: '#f0f2ff',
         bodyColor: '#8892b0',
         callbacks: {
-          label: (ctx) => ` ${ctx.parsed.y}% confidence`,
+          label: (ctx) => ` ${ctx.parsed.y}% of replies cited at least one source`,
         },
       },
     },
@@ -103,49 +154,19 @@ export default function DashboardPage({ password }) {
     },
   };
 
-  // Intent pie chart
-  const topIntents = (data?.intentDistribution || []).slice(0, 8);
-  const pieData = {
-    labels: topIntents.map((i) => i.intent),
-    datasets: [{
-      data: topIntents.map((i) => i.count),
-      backgroundColor: CHART_COLORS,
-      borderColor: '#0e1320',
-      borderWidth: 2,
-    }],
-  };
-
-  const pieOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          color: '#8892b0',
-          font: { size: 11 },
-          padding: 12,
-          boxWidth: 12,
-        },
-      },
-      tooltip: {
-        backgroundColor: '#141928',
-        borderColor: 'rgba(99,102,241,0.3)',
-        borderWidth: 1,
-        titleColor: '#f0f2ff',
-        bodyColor: '#8892b0',
-      },
-    },
-  };
-
-  const maxIntentCount = topIntents[0]?.count || 1;
+  const sourceCoveragePct = data?.sourceCoverage != null
+    ? `${Math.round(data.sourceCoverage * 100)}%`
+    : '—';
+  const haltRatePct = data?.haltRate != null
+    ? `${Math.round(data.haltRate * 100)}%`
+    : '—';
 
   return (
     <div className="dashboard-page">
       <div className="dashboard-header">
         <div>
           <div className="dashboard-title">Analytics Dashboard</div>
-          <div className="dashboard-subtitle">Compliance chatbot performance &amp; insights</div>
+          <div className="dashboard-subtitle">GrahamAI performance &amp; insights</div>
         </div>
         <button className="refresh-btn" onClick={refresh}>↻ Refresh</button>
       </div>
@@ -172,15 +193,22 @@ export default function DashboardPage({ password }) {
           label="Total Messages"
         />
         <StatCard
-          icon="🎯" iconClass="green"
-          value={data?.avgConfidence !== null ? `${Math.round((data.avgConfidence || 0) * 100)}%` : '—'}
-          label="Avg Confidence"
-          sub={data?.avgConfidence >= 0.75 ? '↑ High accuracy' : data?.avgConfidence >= 0.5 ? '~ Medium accuracy' : null}
+          icon="📎" iconClass="green"
+          value={sourceCoveragePct}
+          label="Source Coverage"
+          sub="Replies grounded in a citation"
         />
         <StatCard
-          icon="📅" iconClass="amber"
-          value={data?.activeTodaySessions ?? 0}
-          label="Active Today"
+          icon="🛑" iconClass="amber"
+          value={haltRatePct}
+          label="Halt Rate"
+          sub="Intake gate stopped these"
+        />
+        <StatCard
+          icon="🚨" iconClass="red"
+          value={data?.totalEscalated ?? 0}
+          label="Auto-Escalated"
+          sub="URGENT ESCALATION fires"
         />
       </div>
 
@@ -190,8 +218,8 @@ export default function DashboardPage({ password }) {
         <div className="chart-card">
           <div className="chart-card-header">
             <div>
-              <div className="chart-card-title">Confidence Trend</div>
-              <div className="chart-card-sub">Average response confidence over time</div>
+              <div className="chart-card-title">Source Coverage Trend</div>
+              <div className="chart-card-sub">% of replies citing at least one source, by day</div>
             </div>
           </div>
           {trendLabels.length > 0 ? (
@@ -206,70 +234,97 @@ export default function DashboardPage({ password }) {
           )}
         </div>
 
-        {/* Intent Distribution */}
         <div className="chart-card">
           <div className="chart-card-header">
             <div>
-              <div className="chart-card-title">Intent Distribution</div>
-              <div className="chart-card-sub">Top matched intents</div>
+              <div className="chart-card-title">Intake Gate Decisions</div>
+              <div className="chart-card-sub">Step 0 outcomes (pass / refusal / emergency / out-of-scope)</div>
             </div>
           </div>
-          {topIntents.length > 0 ? (
+          {(data?.decisionDistribution || []).length > 0 ? (
             <div className="chart-wrap">
-              <Pie data={pieData} options={pieOptions} />
+              <Doughnut
+                data={pickDecisionPie(data.decisionDistribution)}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  cutout: '60%',
+                  plugins: {
+                    legend: {
+                      position: 'bottom',
+                      labels: { color: '#8892b0', font: { size: 11 }, padding: 12, boxWidth: 12 },
+                    },
+                    tooltip: {
+                      backgroundColor: '#141928',
+                      borderColor: 'rgba(99,102,241,0.3)',
+                      borderWidth: 1,
+                      titleColor: '#f0f2ff',
+                      bodyColor: '#8892b0',
+                    },
+                  },
+                }}
+              />
             </div>
           ) : (
             <div className="chart-empty">
-              <span style={{ fontSize: 32, opacity: 0.3 }}>🥧</span>
-              <span>No intent data yet</span>
+              <span style={{ fontSize: 32, opacity: 0.3 }}>🛡️</span>
+              <span>No intake-gate data yet</span>
+            </div>
+          )}
+        </div>
+
+        <div className="chart-card">
+          <div className="chart-card-header">
+            <div>
+              <div className="chart-card-title">Sensitivity Routing</div>
+              <div className="chart-card-sub">Step 2 outcomes for passes (HIGH vs STANDARD)</div>
+            </div>
+          </div>
+          {(data?.sensitivityDistribution || []).length > 0 ? (
+            <div className="chart-wrap">
+              <Bar
+                data={pickSensitivityBar(data.sensitivityDistribution)}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                      backgroundColor: '#141928',
+                      borderColor: 'rgba(99,102,241,0.3)',
+                      borderWidth: 1,
+                      titleColor: '#f0f2ff',
+                      bodyColor: '#8892b0',
+                    },
+                  },
+                  scales: {
+                    x: {
+                      grid: { display: false },
+                      ticks: { color: '#8892b0', font: { size: 12 } },
+                    },
+                    y: {
+                      grid: { color: 'rgba(255,255,255,0.04)' },
+                      ticks: { color: '#4a5568', font: { size: 11 }, precision: 0 },
+                      beginAtZero: true,
+                    },
+                  },
+                }}
+              />
+            </div>
+          ) : (
+            <div className="chart-empty">
+              <span style={{ fontSize: 32, opacity: 0.3 }}>⚖️</span>
+              <span>No sensitivity data yet</span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Intent Table */}
-      {topIntents.length > 0 && (
-        <div className="chart-card">
-          <div className="chart-card-header">
-            <div>
-              <div className="chart-card-title">Intent Breakdown</div>
-              <div className="chart-card-sub">Frequency of each matched intent</div>
-            </div>
-          </div>
-          <table className="intent-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Intent Name</th>
-                <th>Frequency</th>
-                <th>Distribution</th>
-              </tr>
-            </thead>
-            <tbody>
-              {topIntents.map((item, i) => (
-                <tr key={item.intent}>
-                  <td style={{ color: 'var(--text-muted)', fontSize: 12 }}>{i + 1}</td>
-                  <td>{item.intent}</td>
-                  <td>
-                    <span className="badge badge-accent">{item.count} hits</span>
-                  </td>
-                  <td>
-                    <div className="intent-bar-wrap">
-                      <div
-                        className="intent-bar"
-                        style={{ width: `${(item.count / maxIntentCount) * 120}px` }}
-                      />
-                      <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                        {Math.round((item.count / (data?.totalMessages || 1)) * 100)}%
-                      </span>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* Escalation Queue */}
+      <EscalationQueue password={password} />
+
+      {/* Documents */}
+      <DocumentsPanel password={password} />
     </div>
   );
 }

@@ -28,7 +28,7 @@ export default function LoginGate({ onLogin }) {
         <img src={logo} alt="Graham logo" className="login-logo-img" />
       </div>
       <div className="login-header">
-        <h1 className="login-title">ComplianceAI</h1>
+        <h1 className="login-title">GrahamAI</h1>
         <p className="login-subtitle">
           Your AI-powered compliance assistant.<br />
           Enter your access password to continue.
@@ -66,7 +66,7 @@ export default function LoginGate({ onLogin }) {
       </form>
 
       <p className="login-footer">
-        Protected workspace · ComplianceAI v2.0
+        Protected workspace · GrahamAI v2.0
       </p>
     </div>
   );

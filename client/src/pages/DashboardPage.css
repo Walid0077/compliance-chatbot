@@ -68,6 +68,7 @@
 .stat-card-icon.green  { background: rgba(16,217,126,0.12); }
 .stat-card-icon.amber  { background: rgba(245,158,11,0.12); }
 .stat-card-icon.blue   { background: rgba(56,189,248,0.12); }
+.stat-card-icon.red    { background: rgba(239,68,68,0.13); }
 
 .stat-card-body {
   display: flex;

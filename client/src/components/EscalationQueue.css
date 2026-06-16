@@ -1,0 +1,159 @@
+.escalation-queue {
+  margin-top: 24px;
+}
+
+.escalation-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.filter-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted, #8892b0);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filter-btn:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+  color: var(--text-bright, #f0f2ff);
+}
+
+.filter-btn.active {
+  background: rgba(99, 102, 241, 0.18);
+  border-color: rgba(99, 102, 241, 0.55);
+  color: #cbd0ff;
+}
+
+.refresh-btn.small {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.escalation-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.escalation-table th {
+  text-align: left;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-muted, #8892b0);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.escalation-table td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  vertical-align: middle;
+}
+
+.escalation-table td.ts {
+  color: var(--text-muted, #8892b0);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.escalation-table td.query {
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.escalation-table td.actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.escalation-table button {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text, #cbd5e1);
+  padding: 5px 11px;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.escalation-table button:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.45);
+}
+
+.escalation-table button.primary {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.55);
+  color: #e0e3ff;
+}
+
+.escalation-table button.primary:hover {
+  background: rgba(99, 102, 241, 0.4);
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  margin-right: 4px;
+}
+
+.badge-trigger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-dest {
+  background: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  text-transform: lowercase;
+}
+
+.status {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-open {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.status-in_review {
+  background: rgba(56, 189, 248, 0.15);
+  color: #7dd3fc;
+}
+
+.status-closed {
+  background: rgba(16, 185, 129, 0.13);
+  color: #6ee7b7;
+}
+
+.muted {
+  color: var(--text-muted, #8892b0);
+}
+
+.resolution {
+  font-size: 11px;
+  font-style: italic;
+}

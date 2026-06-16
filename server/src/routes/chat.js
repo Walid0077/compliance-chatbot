@@ -3,6 +3,10 @@ const multer = require('multer');
 const dialogflow = require('../services/dialogflow');
 const { extractText } = require('../services/fileExtract');
 const store = require('../storage/store');
+const escalations = require('../storage/escalations');
+const documents = require('../storage/documents');
+const { classify } = require('../services/classification');
+const { buildCitations } = require('../services/citations');
 
 const router = Router();
 
@@ -137,11 +141,60 @@ router.post('/', upload.single('file'), async (req, res, next) => {
       replyText = 'No response from agent.';
     }
 
-    // Save bot message with metadata
+    // Build inline citation metadata so the client can render hover-able
+    // links inside the bot reply. Combines RAG sources from this turn
+    // with the known internal documents list. Listing failures degrade
+    // gracefully — citations are nice-to-have, never block the reply.
+    let citations = [];
+    try {
+      const internalDocs = await documents.listDocuments();
+      citations = buildCitations(replyText, uniqueSources, internalDocs);
+    } catch (citeErr) {
+      console.error('[citations] build failed:', citeErr.message);
+    }
+
+    // Reconstruct Graham's Step 0 / Step 2 classifications from the reply.
+    // The agent does not surface code-action returns through detectIntent,
+    // so we re-derive from canonical markers and a keyword scan. See
+    // services/classification.js for the rules.
+    const classification = classify({
+      userMessage: message,
+      documentUploaded: Boolean(fileName) && !isImage,
+      replyText,
+    });
+
+    // Auto-create an escalation ticket when the intake gate (either the
+    // deployed code action or our server-side mirror) fires emergency.
+    let escalationId = null;
+    if (classification.decision === 'emergency') {
+      try {
+        const ticket = escalations.createEscalation({
+          sessionId,
+          userQuery: message,
+          agentResponse: replyText,
+          decision: 'emergency',
+          trigger: classification.gateTrigger,
+          source: 'auto',
+          destinations: ['legal', 'dpo', 'hr'],
+        });
+        escalationId = ticket.id;
+      } catch (escErr) {
+        // Never block the chat reply on escalation-store issues.
+        console.error('[escalation] auto-create failed:', escErr.message);
+      }
+    }
+
+    // Save bot message with metadata (classification fields feed the dashboard).
     store.saveMessage(sessionId, 'bot', replyText, {
       intentName,
       confidence,
       sourceCount: uniqueSources.length,
+      citationCount: citations.length,
+      escalationId,
+      decision: classification.decision,
+      sensitivity: classification.sensitivity,
+      route: classification.route,
+      sensitivityTrigger: classification.triggerHigh,
     });
 
     res.json({
@@ -150,6 +203,9 @@ router.post('/', upload.single('file'), async (req, res, next) => {
       confidence,
       sources: uniqueSources,
       sourceCount: uniqueSources.length,
+      citations,
+      escalationId,
+      classification,
       raw: queryResult,
     });
   } catch (err) {

@@ -6,6 +6,8 @@ dist/
 !.env.example
 !**/.env.example
 data/sessions/
+data/escalations/
+data/documents/
 server/credentials/
 *.key.json
 *service-account*.json

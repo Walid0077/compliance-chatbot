@@ -88,11 +88,19 @@ function getAnalytics() {
   ensureDir();
   const files = fs.readdirSync(config.dataDir).filter((f) => f.endsWith('.json'));
   const intentCounts = {};
-  const confidenceByDay = {};
+  const decisionCounts = {};
+  const sensitivityCounts = {};
+  const routeCounts = {};
+  // Daily aggregation of source-coverage. Each entry holds:
+  //   withSource: # of bot replies that day with >=1 citation
+  //   total: total # of bot replies that day
+  const sourcesByDay = {};
+  let totalBotMessages = 0;
   let totalMessages = 0;
-  let totalConfidenceSum = 0;
-  let totalConfidenceCount = 0;
+  let totalBotWithSources = 0;
+  let totalHalts = 0;
   let totalSessions = 0;
+  let totalEscalated = 0;
   const today = new Date().toISOString().slice(0, 10);
   let activeTodaySessions = 0;
 
@@ -107,18 +115,31 @@ function getAnalytics() {
       }
 
       for (const msg of session.messages) {
-        if (msg.role === 'bot') {
-          if (typeof msg.confidence === 'number') {
-            totalConfidenceSum += msg.confidence;
-            totalConfidenceCount++;
-            const day = msg.timestamp.slice(0, 10);
-            if (!confidenceByDay[day]) confidenceByDay[day] = { sum: 0, count: 0 };
-            confidenceByDay[day].sum += msg.confidence;
-            confidenceByDay[day].count++;
-          }
-          if (msg.intentName) {
-            intentCounts[msg.intentName] = (intentCounts[msg.intentName] || 0) + 1;
-          }
+        if (msg.role !== 'bot') continue;
+        totalBotMessages++;
+        const day = (msg.timestamp || '').slice(0, 10);
+        if (day) {
+          if (!sourcesByDay[day]) sourcesByDay[day] = { withSource: 0, total: 0 };
+          sourcesByDay[day].total++;
+          if ((msg.sourceCount || 0) > 0) sourcesByDay[day].withSource++;
+        }
+        if ((msg.sourceCount || 0) > 0) totalBotWithSources++;
+
+        if (msg.intentName) {
+          intentCounts[msg.intentName] = (intentCounts[msg.intentName] || 0) + 1;
+        }
+        if (msg.decision) {
+          decisionCounts[msg.decision] = (decisionCounts[msg.decision] || 0) + 1;
+          if (msg.decision !== 'pass' && msg.decision !== 'unknown') totalHalts++;
+        }
+        if (msg.sensitivity) {
+          sensitivityCounts[msg.sensitivity] = (sensitivityCounts[msg.sensitivity] || 0) + 1;
+        }
+        if (msg.route) {
+          routeCounts[msg.route] = (routeCounts[msg.route] || 0) + 1;
+        }
+        if (msg.escalationId) {
+          totalEscalated++;
         }
       }
     } catch {
@@ -126,31 +147,51 @@ function getAnalytics() {
     }
   }
 
-  const avgConfidence =
-    totalConfidenceCount > 0
-      ? parseFloat((totalConfidenceSum / totalConfidenceCount).toFixed(3))
-      : null;
+  // Source coverage = share of bot replies grounded in at least one RAG
+  // citation. Higher is better; the intent is a single, demo-ready
+  // proxy for "how often are answers backed by sources we can show?"
+  const sourceCoverage = totalBotMessages > 0
+    ? parseFloat((totalBotWithSources / totalBotMessages).toFixed(3))
+    : null;
 
-  const confidenceTrend = Object.entries(confidenceByDay)
+  // Halt rate = share of bot replies where the intake gate stopped the
+  // request (refusal / emergency / out-of-scope). A governance proxy
+  // for "what fraction of traffic is being filtered at the door?"
+  const haltRate = totalBotMessages > 0
+    ? parseFloat((totalHalts / totalBotMessages).toFixed(3))
+    : null;
+
+  const sourceCoverageTrend = Object.entries(sourcesByDay)
     .sort(([a], [b]) => a.localeCompare(b))
     .slice(-30)
-    .map(([day, { sum, count }]) => ({
+    .map(([day, { withSource, total }]) => ({
       date: day,
-      avgConfidence: parseFloat((sum / count).toFixed(3)),
-      messageCount: count,
+      coverage: parseFloat((withSource / total).toFixed(3)),
+      messageCount: total,
     }));
 
   const intentDistribution = Object.entries(intentCounts)
     .sort(([, a], [, b]) => b - a)
     .map(([intent, count]) => ({ intent, count }));
 
+  const toRanked = (obj) =>
+    Object.entries(obj)
+      .sort(([, a], [, b]) => b - a)
+      .map(([key, count]) => ({ key, count }));
+
   return {
     totalSessions,
     totalMessages,
-    avgConfidence,
+    totalBotMessages,
     activeTodaySessions,
-    confidenceTrend,
+    totalEscalated,
+    sourceCoverage,
+    haltRate,
+    sourceCoverageTrend,
     intentDistribution,
+    decisionDistribution: toRanked(decisionCounts),
+    sensitivityDistribution: toRanked(sensitivityCounts),
+    routeDistribution: toRanked(routeCounts),
   };
 }
 

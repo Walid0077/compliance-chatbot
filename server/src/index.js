@@ -8,6 +8,8 @@ const healthRouter = require('./routes/health');
 const chatRouter = require('./routes/chat');
 const historyRouter = require('./routes/history');
 const analyticsRouter = require('./routes/analytics');
+const escalationsRouter = require('./routes/escalations');
+const documentsRouter = require('./routes/documents');
 
 const app = express();
 
@@ -26,6 +28,8 @@ app.get('/api/verify', (_req, res) => {
 app.use('/api/chat', chatRouter);
 app.use('/api/history', historyRouter);
 app.use('/api/analytics', analyticsRouter);
+app.use('/api/escalations', escalationsRouter);
+app.use('/api/documents', documentsRouter);
 
 app.use((err, _req, res, _next) => {
   console.error('Unhandled error:', err);

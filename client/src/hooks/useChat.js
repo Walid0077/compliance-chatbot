@@ -48,9 +48,10 @@ export function useChat(password) {
         role: 'bot',
         text: data.reply,
         timestamp: new Date().toISOString(),
-        intentName: data.intentName,
-        confidence: data.confidence,
         sourceCount: data.sourceCount ?? 0,
+        sources: data.sources || [],
+        citations: data.citations || [],
+        classification: data.classification || null,
       };
       setSessions((prev) => {
         const updated = [...prev];

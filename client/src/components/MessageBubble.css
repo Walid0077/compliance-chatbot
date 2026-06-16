@@ -109,31 +109,162 @@
   color: var(--text-muted);
 }
 
-.confidence-badge {
+.source-badge {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  padding: 2px 6px;
-  border-radius: 20px;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 10px;
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 500;
+  background: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.25);
 }
 
-.confidence-high   { background: rgba(34,197,94,0.1);   color: var(--success); }
-.confidence-medium { background: rgba(245,158,11,0.1);  color: var(--warning); }
-.confidence-low    { background: rgba(239,68,68,0.1);   color: var(--danger);  }
+/* Inline citation hyperlinks in bot replies. Hover shows the document
+   name via the native `title` attribute; click opens in a new tab. */
+.citation {
+  color: #a5b4fc;
+  text-decoration: underline;
+  text-decoration-color: rgba(165, 180, 252, 0.35);
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  cursor: pointer;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease, background 0.15s ease;
+  border-radius: 3px;
+  padding: 0 1px;
+}
 
-.intent-tag {
-  font-size: 10px;
-  color: var(--text-muted);
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border);
-  max-width: 180px;
+.citation:hover {
+  color: #c7d2fe;
+  text-decoration-color: rgba(199, 210, 254, 0.7);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.citation-rag {
+  /* RAG-sourced citation (from the data store) */
+  border-bottom: 1px dotted transparent;
+}
+
+.citation-doc {
+  /* Internal document citation */
+  color: #93c5fd;
+  text-decoration-color: rgba(147, 197, 253, 0.35);
+}
+
+.citation-doc:hover {
+  color: #bfdbfe;
+  text-decoration-color: rgba(191, 219, 254, 0.7);
+  background: rgba(56, 189, 248, 0.08);
+}
+
+/* Wikipedia-style hover popover for citations that ship with a
+   snippet. Pure CSS — no JS positioning. Anchored above the link by
+   default; if the bubble is too close to the top, the popover would
+   clip, but for chat content that is rare. */
+.citation-wrap {
+  position: relative;
+  display: inline;
+}
+
+.citation-popover {
+  position: absolute;
+  left: 0;
+  width: 340px;
+  max-width: 80vw;
+  padding: 12px 14px;
+  background: #131826;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-primary, #e5e7eb);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 60;
+  white-space: normal;
+  text-align: left;
+}
+
+/* Popover anchored ABOVE the link (default placement). Pointer hangs
+   off the bottom edge pointing down toward the link. */
+.citation-popover-above {
+  bottom: calc(100% + 6px);
+  top: auto;
+  transform: translateY(4px);
+}
+
+/* Popover anchored BELOW the link. Used when there isn't enough room
+   above (top of viewport / chat header). Pointer sits on the top edge
+   pointing up toward the link. */
+.citation-popover-below {
+  top: calc(100% + 6px);
+  bottom: auto;
+  transform: translateY(-4px);
+}
+
+.citation-wrap:hover .citation-popover,
+.citation-wrap:focus-within .citation-popover {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.citation-popover-label {
+  font-weight: 600;
+  font-size: 12px;
+  color: #c7d2fe;
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+
+.citation-popover-snippet {
+  color: var(--text-secondary, #cbd5e1);
+  font-size: 12.5px;
+  /* Cap to 6 lines for very long snippets */
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+.citation-popover-cta {
+  font-size: 11px;
+  color: #a5b4fc;
+  margin-top: 2px;
+}
+
+/* Pointer tails — diamond rotated 45deg with two visible borders so
+   the seam blends into the popover edge. The above/below variants
+   reuse the same square; only the border edges and position flip. */
+.citation-popover::after {
+  content: '';
+  position: absolute;
+  left: 22px;
+  width: 10px;
+  height: 10px;
+  background: #131826;
+  transform: rotate(45deg);
+}
+
+.citation-popover-above::after {
+  top: 100%;
+  margin-top: -5px;
+  border-right: 1px solid rgba(99, 102, 241, 0.3);
+  border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.citation-popover-below::after {
+  bottom: 100%;
+  margin-bottom: -5px;
+  border-left: 1px solid rgba(99, 102, 241, 0.3);
+  border-top: 1px solid rgba(99, 102, 241, 0.3);
 }
 
 /* File attachment badge */

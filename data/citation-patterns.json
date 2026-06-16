@@ -1,0 +1,39 @@
+[
+  {
+    "kind": "regulation",
+    "pattern": "GDPR\\s+Article\\s+(\\d+)(?:\\(\\d+\\))?(?:\\([a-zA-Z]\\))?",
+    "url": "https://gdpr-info.eu/art-{1}-gdpr/",
+    "flags": "gi"
+  },
+  {
+    "kind": "regulation",
+    "pattern": "(?:Article|Art\\.?)\\s+(\\d+)\\s+of\\s+(?:the\\s+)?GDPR",
+    "url": "https://gdpr-info.eu/art-{1}-gdpr/",
+    "flags": "gi"
+  },
+  {
+    "kind": "regulation",
+    "pattern": "Recital\\s+(\\d+)\\s+of\\s+(?:the\\s+)?GDPR",
+    "url": "https://gdpr-info.eu/recitals/no-{1}/",
+    "flags": "gi"
+  },
+  {
+    "kind": "regulation",
+    "pattern": "(?:EU\\s+)?AI\\s+Act\\s+Article\\s+(\\d+)",
+    "url": "https://artificialintelligenceact.eu/article/{1}/",
+    "flags": "gi"
+  },
+  {
+    "kind": "regulation",
+    "pattern": "Annex\\s+(I{1,3}|IV|V|VI|VII|VIII|IX|X)\\s+(?:of\\s+(?:the\\s+)?)?(?:EU\\s+)?AI\\s+Act",
+    "url": "https://artificialintelligenceact.eu/annex/{1}/",
+    "flags": "gi"
+  },
+  {
+    "kind": "regulation",
+    "pattern": "SDG\\s+(\\d+)",
+    "url": "https://sdgs.un.org/goals/goal{1}",
+    "flags": "gi",
+    "label": "UN Sustainable Development Goal {1}"
+  }
+]

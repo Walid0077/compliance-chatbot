@@ -1,11 +1,18 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const readline = require('readline/promises');
 
 const serverRoot = path.resolve(__dirname, '..');
 const envPath = path.join(serverRoot, '.env');
+
+// User-level cache of last-good values. Lives outside the repo so
+// subsequent clones / wiped .env files don't require retyping creds.
+// Same security posture as .env (mode 0600); contains the app password.
+const cacheDir = path.join(os.homedir(), '.config', 'compliance-chatbot');
+const cachePath = path.join(cacheDir, 'setup.json');
 
 const fields = [
   {
@@ -45,6 +52,16 @@ const fields = [
       return null;
     },
   },
+  {
+    key: 'GCS_DOCUMENTS_BUCKET',
+    label: 'GCS bucket for regulatory documents (optional; paste from Cloud Storage)',
+    required: false,
+    example: 'gs://my-bucket/datastore/folder',
+    hint: 'Accepts any of: "my-bucket", "gs://my-bucket", "my-bucket/sub/folder", or ' +
+          '"gs://my-bucket/sub/folder". The server parses bucket + prefix automatically, ' +
+          'so paste straight from Cloud Storage. The service account in ' +
+          'GOOGLE_APPLICATION_CREDENTIALS needs roles/storage.objectViewer on the bucket.',
+  },
 ];
 
 function parseArgs() {
@@ -52,7 +69,32 @@ function parseArgs() {
   return {
     check: args.has('--check'),
     noPrompt: args.has('--no-prompt') || args.has('--ci'),
+    fromCache: args.has('--from-cache'),
   };
+}
+
+function loadCache() {
+  if (!fs.existsSync(cachePath)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
+function writeCache(values) {
+  // Persist only fields the setup script manages; nothing extra.
+  const subset = {};
+  for (const field of fields) {
+    if (values[field.key]) subset[field.key] = values[field.key];
+  }
+  try {
+    if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+    fs.writeFileSync(cachePath, JSON.stringify(subset, null, 2), { mode: 0o600 });
+  } catch (err) {
+    // Cache is convenience; failures must not break a successful setup.
+    console.warn(`(could not write setup cache: ${err.message})`);
+  }
 }
 
 function parseEnvFile(filePath) {
@@ -175,11 +217,33 @@ async function promptForValues(existing) {
 
 async function main() {
   const args = parseArgs();
-  const existing = parseEnvFile(envPath);
+  const envValues = parseEnvFile(envPath);
+  const cachedValues = loadCache();
+  // .env wins over cache; cache fills gaps so a wiped .env can recover.
+  const existing = { ...cachedValues, ...envValues };
   const errors = validate(existing);
 
   if (args.check && errors.length === 0) {
+    // .env already complete — make sure cache reflects the latest values.
+    if (Object.keys(envValues).length > 0) writeCache(envValues);
     return;
+  }
+
+  // Non-interactive: write .env straight from cache when the cache is
+  // complete and valid. Lets `npm run setup -- --from-cache` (or any
+  // CI run with a populated cache) finish without prompting.
+  if (args.fromCache || args.check) {
+    if (validate(cachedValues).length === 0) {
+      fs.writeFileSync(envPath, buildEnvFile(cachedValues), { mode: 0o600 });
+      writeCache(cachedValues);
+      console.log(`Restored ${path.relative(process.cwd(), envPath)} from cached values (${cachePath}).`);
+      return;
+    }
+    if (args.fromCache) {
+      console.error('Cache is empty or incomplete; cannot restore .env non-interactively.');
+      console.error('Run `npm run setup` once interactively to populate the cache, then retry.');
+      process.exit(1);
+    }
   }
 
   if (args.noPrompt || !process.stdin.isTTY || !process.stdout.isTTY) {
@@ -192,6 +256,11 @@ async function main() {
     process.exit(1);
   }
 
+  if (Object.keys(envValues).length === 0 && Object.keys(cachedValues).length > 0) {
+    console.log(`Using cached values from ${cachePath} as defaults. Press Enter to accept each.`);
+    console.log('');
+  }
+
   const values = await promptForValues(existing);
   const finalErrors = validate(values);
   if (finalErrors.length) {
@@ -200,8 +269,10 @@ async function main() {
   }
 
   fs.writeFileSync(envPath, buildEnvFile(values), { mode: 0o600 });
+  writeCache(values);
   console.log('');
   console.log(`Wrote ${path.relative(process.cwd(), envPath)}`);
+  console.log(`Cached values to ${cachePath} for the next clone / .env wipe.`);
 }
 
 main().catch((error) => {

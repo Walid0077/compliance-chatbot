@@ -1,0 +1,53 @@
+{
+  "_description": "Hover-preview snippets keyed by the exact citation phrase Graham produces. Looked up in services/citations.js. Fall-back chain: exact phrase → article-only (parentheticals stripped) → no snippet.",
+
+  "GDPR Article 5": "Article 5 — Principles relating to processing of personal data. Personal data shall be: (a) processed lawfully, fairly and in a transparent manner ('lawfulness, fairness and transparency'); (b) collected for specified, explicit and legitimate purposes ('purpose limitation'); (c) adequate, relevant and limited to what is necessary ('data minimisation'); (d) accurate and, where necessary, kept up to date ('accuracy'); (e) kept in a form which permits identification for no longer than is necessary ('storage limitation'); (f) processed in a manner that ensures appropriate security ('integrity and confidentiality').",
+
+  "GDPR Article 5(1)(a)": "(a) processed lawfully, fairly and in a transparent manner in relation to the data subject ('lawfulness, fairness and transparency').",
+
+  "GDPR Article 5(1)(b)": "(b) collected for specified, explicit and legitimate purposes and not further processed in a manner that is incompatible with those purposes ('purpose limitation').",
+
+  "GDPR Article 5(1)(c)": "(c) adequate, relevant and limited to what is necessary in relation to the purposes for which they are processed ('data minimisation').",
+
+  "GDPR Article 5(1)(d)": "(d) accurate and, where necessary, kept up to date; every reasonable step must be taken to ensure that personal data that are inaccurate are erased or rectified without delay ('accuracy').",
+
+  "GDPR Article 5(1)(e)": "(e) kept in a form which permits identification of data subjects for no longer than is necessary for the purposes for which the personal data are processed ('storage limitation').",
+
+  "GDPR Article 5(1)(f)": "(f) processed in a manner that ensures appropriate security of the personal data, including protection against unauthorised or unlawful processing and against accidental loss, destruction or damage, using appropriate technical or organisational measures ('integrity and confidentiality').",
+
+  "GDPR Article 6": "Article 6 — Lawfulness of processing. Processing shall be lawful only if and to the extent that at least one of the following applies: (a) consent; (b) performance of a contract; (c) compliance with a legal obligation; (d) protection of vital interests; (e) performance of a task carried out in the public interest; (f) legitimate interests pursued by the controller or by a third party.",
+
+  "GDPR Article 7": "Article 7 — Conditions for consent. Where processing is based on consent, the controller shall be able to demonstrate that the data subject has consented. Consent must be freely given, specific, informed and unambiguous. The data subject has the right to withdraw consent at any time.",
+
+  "GDPR Article 9": "Article 9 — Processing of special categories of personal data. Processing of personal data revealing racial or ethnic origin, political opinions, religious beliefs, trade union membership, genetic or biometric data, health, sex life or sexual orientation shall be prohibited, except under specific conditions listed in Article 9(2).",
+
+  "GDPR Article 17": "Article 17 — Right to erasure ('right to be forgotten'). The data subject shall have the right to obtain from the controller the erasure of personal data concerning them without undue delay, where one of the grounds listed in Article 17(1) applies.",
+
+  "GDPR Article 25": "Article 25 — Data protection by design and by default. The controller shall implement appropriate technical and organisational measures, both at the time of determination of the means of processing and at the time of processing itself, to give effect to data protection principles in an effective manner.",
+
+  "GDPR Article 32": "Article 32 — Security of processing. The controller and processor shall implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including pseudonymisation, encryption, resilience, and regular testing of measures.",
+
+  "GDPR Article 33": "Article 33 — Notification of a personal data breach to the supervisory authority. The controller shall notify the supervisory authority within 72 hours of becoming aware of a personal data breach unless the breach is unlikely to result in a risk to the rights and freedoms of natural persons.",
+
+  "GDPR Article 35": "Article 35 — Data protection impact assessment (DPIA). Where a type of processing is likely to result in a high risk to the rights and freedoms of natural persons, the controller shall carry out an assessment of the impact of the envisaged processing operations on the protection of personal data prior to the processing.",
+
+  "GDPR Article 44": "Article 44 — General principle for transfers. Any transfer of personal data to a third country or to an international organisation shall take place only if the conditions laid down in Chapter V are complied with by the controller and processor.",
+
+  "EU AI Act Article 5": "Article 5 — Prohibited AI practices. The placing on the market, putting into service or use of certain AI systems shall be prohibited, including: subliminal manipulation, exploitation of vulnerabilities, social scoring by public authorities, and real-time remote biometric identification in publicly accessible spaces for law enforcement (with narrow exceptions).",
+
+  "EU AI Act Article 6": "Article 6 — Classification rules for high-risk AI systems. An AI system shall be considered high-risk where (a) it is intended to be used as a safety component of a product covered by Union harmonisation legislation listed in Annex I and that product is required to undergo a third-party conformity assessment, or (b) it is referred to in Annex III.",
+
+  "EU AI Act Article 9": "Article 9 — Risk management system. A risk management system shall be established, implemented, documented and maintained for high-risk AI systems. It shall consist of a continuous iterative process running through the entire lifecycle of the AI system.",
+
+  "EU AI Act Article 10": "Article 10 — Data and data governance. Training, validation and testing data sets shall be subject to appropriate data governance and management practices, including relevance, representativeness, freedom from errors, and appropriate statistical properties.",
+
+  "EU AI Act Article 14": "Article 14 — Human oversight. High-risk AI systems shall be designed and developed in such a way that they can be effectively overseen by natural persons during the period in which the AI system is in use.",
+
+  "EU AI Act Annex III": "Annex III — High-risk AI systems referred to in Article 6(2). Categories include: biometric identification and categorisation, critical infrastructure management, education and vocational training, employment and worker management, access to essential services, law enforcement, migration and border control, and administration of justice.",
+
+  "SDG 9": "SDG 9 — Build resilient infrastructure, promote inclusive and sustainable industrialization and foster innovation.",
+
+  "SDG 12": "SDG 12 — Ensure sustainable consumption and production patterns.",
+
+  "SDG 16": "SDG 16 — Promote peaceful and inclusive societies for sustainable development, provide access to justice for all and build effective, accountable and inclusive institutions at all levels."
+}
